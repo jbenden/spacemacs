@@ -73,6 +73,10 @@
 ;; auto-indent on RET
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
+;; re-indent on TAB and Shift-TAB
+(define-key evil-visual-state-map (kbd "TAB") 'spacemacs/indent-region-or-buffer)
+(define-key evil-visual-state-map (kbd "S-TAB") 'ident-rigidly-left-to-tab-stop)
+
 ;; improve delete-other-windows
 (define-key global-map (kbd "C-x 1") 'spacemacs/toggle-maximize-buffer)
 

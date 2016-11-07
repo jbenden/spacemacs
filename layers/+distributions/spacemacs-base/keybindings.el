@@ -134,6 +134,10 @@
   "bs"    'spacemacs/switch-to-scratch-buffer
   "bY"    'spacemacs/copy-whole-buffer-to-clipboard
   "bw"    'read-only-mode)
+(dotimes (i 9)
+  (let ((n (+ i 1)))
+    (spacemacs/set-leader-keys (format "b%i" n)
+      (intern (format "buffer-to-window-%s" n)))))
 ;; Cycling settings -----------------------------------------------------------
 (spacemacs/set-leader-keys "Tn" 'spacemacs/cycle-spacemacs-theme)
 ;; errors ---------------------------------------------------------------------
@@ -307,7 +311,15 @@
   :on (hidden-mode-line-mode -1)
   :off (hidden-mode-line-mode)
   :documentation "Toggle the visibility of modeline."
+  :evil-leader "tmT")
+(spacemacs|add-toggle display-time
+  :mode display-time-mode
+  :documentation "Display time in modeline."
   :evil-leader "tmt")
+(spacemacs|add-toggle syntax-highlighting
+  :mode font-lock-mode
+  :documentation "Toggle syntax highlighting."
+  :evil-leader "ths")
 (spacemacs|add-toggle transparent-frame
   :status nil
   :on (spacemacs/toggle-transparency)
@@ -384,7 +396,7 @@
   "wc"  'spacemacs/toggle-centered-buffer-mode
   "wC"  'spacemacs/centered-buffer-mode-full-width
   "wo"  'other-frame
-  "wr"  'spacemacs/rotate-windows
+  "wr"  'spacemacs/rotate-windows-forward
   "wR"  'spacemacs/rotate-windows-backward
   "ws"  'split-window-below
   "wS"  'split-window-below-and-focus
@@ -422,6 +434,7 @@
   "xjl" 'set-justification-left
   "xjn" 'set-justification-none
   "xjr" 'set-justification-right
+  "xld" 'spacemacs/duplicate-line-or-region
   "xls" 'spacemacs/sort-lines
   "xlu" 'spacemacs/uniquify-lines
   "xtc" 'transpose-chars
@@ -532,7 +545,7 @@
   ("L" evil-window-move-far-right)
   ("<S-right>" evil-window-move-far-right)
   ("o" other-frame)
-  ("r" spacemacs/rotate-windows)
+  ("r" spacemacs/rotate-windows-forward)
   ("R" spacemacs/rotate-windows-backward)
   ("s" split-window-below)
   ("S" split-window-below-and-focus)

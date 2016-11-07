@@ -126,6 +126,9 @@ whenever you start Emacs.")
 (defvar dotspacemacs-configuration-layers '(emacs-lisp)
   "List of configuration layers to load.")
 
+(defvar dotspacemacs--configuration-layers-saved nil
+  "Saved value of `dotspacemacs-configuration-layers' after sync.")
+
 (defvar dotspacemacs-themes '(spacemacs-dark
                               spacemacs-light)
   "List of themes, the first of the list is loaded when spacemacs starts.
@@ -248,6 +251,14 @@ key sequence. Setting this variable is equivalent to setting
 right, and right-then-bottom. The last one will display on the
 right if possible and fallback to bottom if not.")
 
+(defvar dotspacemacs-switch-to-buffer-prefers-purpose nil
+  "Control where `switch-to-buffer' displays the buffer.
+If nil, `switch-to-buffer' displays the buffer in the current
+window even if another same-purpose window is available. If non
+nil, `switch-to-buffer' displays the buffer in a same-purpose
+window even if the buffer can be displayed in the current
+window.")
+
 (defvar dotspacemacs-loading-progress-bar t
   "If non nil a progress bar is displayed when spacemacs is loading. This
 may increase the boot time on some systems and emacs builds, set it to nil
@@ -361,6 +372,16 @@ are caught and signalled to user in spacemacs buffer."
                                            ',(symbol-name func)
                                            (error-message-string err))
                                    t))))))
+
+(defun dotspacemacs//check-layers-changed ()
+  "Check if the value of `dotspacemacs-configuration-layers'
+changed, and issue a warning if it did."
+  (unless (eq dotspacemacs-configuration-layers
+              dotspacemacs--configuration-layers-saved)
+    (spacemacs-buffer/warning
+     "`dotspacemacs-configuration-layers' was changed outside of `dotspacemacs/layers'.")))
+(add-hook 'spacemacs-post-user-config-hook
+          'dotspacemacs//check-layers-changed)
 
 (defun dotspacemacs//read-editing-style-config (config)
   "Read editing style CONFIG: apply variables and return the editing style.
@@ -535,20 +556,16 @@ If ARG is non nil then Ask questions to the user before installing the dotfile."
           (write-file dotspacemacs-filepath)
           (message "%s has been installed." dotspacemacs-filepath)
           t))))
-  (load-file dotspacemacs-filepath))
-
-(defun dotspacemacs//install-and-replace (&optional values)
-  "Install the dotfile and replace its content according to VALUES.
-
-VALUES is an alist where the key is the text to replace and value is the new
-value."
-  )
+  (dotspacemacs/load-file)
+  ;; force new wizard values to be applied
+  (dotspacemacs/init))
 
 (defun dotspacemacs/load-file ()
   "Load ~/.spacemacs if it exists."
   (let ((dotspacemacs (dotspacemacs/location)))
     (if (file-exists-p dotspacemacs)
-        (unless (with-demoted-errors "Error loading .spacemacs: %S" (load dotspacemacs))
+        (unless (with-demoted-errors "Error loading .spacemacs: %S"
+                  (load dotspacemacs))
           (dotspacemacs/safe-load)))))
 
 (defun dotspacemacs/safe-load ()
